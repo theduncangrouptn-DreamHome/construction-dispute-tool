@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Case Builder — Construction Dispute</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --primary: #1a3a5c;
+    --primary-light: #2a5a8c;
+    --accent: #c0392b;
+    --accent-light: #e74c3c;
+    --bg: #f4f6f9;
+    --surface: #ffffff;
+    --surface2: #eef1f6;
+    --border: rgba(0,0,0,0.1);
+    --text: #1a1a2e;
+    --text2: #5a6a7a;
+    --text3: #8a9aaa;
+    --success: #27ae60;
+    --warning: #f39c12;
+    --danger: #c0392b;
+    --flag-red: #c0392b;
+    --flag-orange: #e67e22;
+    --flag-yellow: #f1c40f;
+    --flag-blue: #2980b9;
+    --flag-purple: #8e44ad;
+    --flag-dark: #2c3e50;
+    --shadow: 0 2px 12px rgba(0,0,0,0.08);
+    --radius: 12px;
+    --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* Header */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--primary);
+    color: white;
+    padding: 12px 20px;
+    font-size: 14px;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+  }
+  .header-title { font-size: 15px; font-weight: 600; }
+  .header-sub { font-size: 11px; opacity: 0.7; margin-top: 1px; }
+  .header-actions { display: flex; gap: 8px; }
+  .header-btn {
+    background: rgba(255,255,255,0.15);
+    border: none;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  .header-btn:hover { background: rgba(255,255,255,0.25); }
+
+  /* Tab bar */
+  .tabs {
+    display: flex;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0;
+    gap: 0;
+  }
+  .tab {
+    flex: 1;
+    padding: 14px 16px;
+    text-align: center;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text2);
+    position: relative;
+  }
+  .tab.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+  }
+  .tab-badge {
+    display: none;
+    position: absolute;
+    top: 4px;
+    right: 8px;
+    background: var(--accent);
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    font-size: 11px;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+  }
+
+  /* Panels */
+  .panel { display: none; flex: 1; flex-direction: column; }
+  .panel.active { display: flex; }
+
+  /* ======= CHAT PANEL ======= */
+  .chat-phase-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #e3f2fd;
+    padding: 12px 16px;
+    font-size: 12px;
+    color: var(--text2);
+    border-bottom: 1px solid var(--border);
+  }
+  .phase-dot { width: 6px; height: 6px; border-radius: 50%; background: #4fc3f7; flex-shrink: 0; }
+  .phase-label { opacity: 0.85; }
+  .phase-name { font-weight: 600; }
+
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .msg {
+    display: flex;
+    flex-direction: column;
+    max-width: 85%;
+    gap: 4px;
+  }
+  .msg.ai { align-self: flex-start; }
+  .msg.user { align-self: flex-end; }
+
+  .msg-bubble {
+    padding: 12px 16px;
+    border-radius: 16px;
+    word-wrap: break-word;
+    line-height: 1.5;
+  }
+  .msg.ai .msg-bubble {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .msg.user .msg-bubble {
+    background: var(--primary);
+    color: white;
+  }
+  .msg-time {
+    font-size: 11px;
+    color: var(--text3);
+    padding: 0 12px;
+  }
+  .msg.user .msg-time { text-align: right; }
+
+  .msg-flags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 0 12px;
+  }
+  .flag-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-weight: 500;
+  }
+  .flag-chip.red { background: #fde8e8; color: #c0392b; }
+  .flag-chip.orange { background: #fef3e2; color: #e67e22; }
+  .flag-chip.yellow { background: #fefde0; color: #b7950b; }
+  .flag-chip.blue { background: #e8f4fd; color: #2980b9; }
+  .flag-chip.purple { background: #f5e6fd; color: #8e44ad; }
+  .flag-chip.dark { background: #e8ecef; color: #2c3e50; }
+
+  /* Typing indicator */
+  .typing {
+    display: flex;
+    gap: 3px;
+    align-items: flex-end;
+    height: 20px;
+  }
+  .typing span {
+    width: 6px;
+    height: 6px;
+    background: var(--text3);
+    border-radius: 50%;
+    animation: bounce 1.4s infinite;
+  }
+  .typing span:nth-child(2) { animation-delay: 0.2s; }
+  .typing span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-8px); }
+  }
+
+  /* Input area */
+  .input-area {
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    padding: 12px 16px;
+    border-top: 1px solid var(--border);
+    gap: 10px;
+  }
+  .input-row {
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+  }
+  .input-box {
+    flex: 1;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-family: var(--font);
+    resize: none;
+    max-height: 100px;
+    line-height: 1.5;
+  }
+  .input-box:focus { border-color: var(--primary-light); }
+  .input-box::placeholder { color: var(--text3); }
+
+  .voice-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .voice-btn.listening {
+    background: var(--accent);
+    animation: pulse 1s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+
+  .send-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .send-btn:disabled { background: var(--text3); }
+  .send-btn:not(:disabled):hover { background: var(--primary-light); }
+
+  .voice-status {
+    font-size: 12px;
+    color: var(--text2);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* ======= FLAGS PANEL ======= */
+  .flags-panel-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    gap: 12px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .flag-card {
+    border-left: 4px solid transparent;
+    background: var(--surface);
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  .flag-card.red { border-color: var(--flag-red); }
+  .flag-card.orange { border-color: var(--flag-orange); }
+  .flag-card.yellow { border-color: var(--flag-yellow); }
+  .flag-card.blue { border-color: var(--flag-blue); }
+  .flag-card.purple { border-color: var(--flag-purple); }
+  .flag-card.dark { border-color: var(--flag-dark); }
+
+  .flag-card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .flag-card-icon { font-size: 14px; }
+  .flag-card-cat { font-size: 12px; font-weight: 700; }
+  .flag-card.red .flag-card-cat { color: var(--flag-red); }
+  .flag-card.orange .flag-card-cat { color: var(--flag-orange); }
+  .flag-card.yellow .flag-card-cat { color: #b7950b; }
+  .flag-card.blue .flag-card-cat { color: var(--flag-blue); }
+  .flag-card.purple .flag-card-cat { color: var(--flag-purple); }
+  .flag-card.dark .flag-card-cat { color: var(--flag-dark); }
+  .flag-card-time { font-size: 10px; color: var(--text3); margin-left: auto; }
+  .flag-card-desc { font-size: 13px; color: var(--text2); line-height: 1.5; }
+
+  .flags-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--text2);
+  }
+  .flags-empty-icon { font-size: 40px; }
+
+  /* ======= TIMELINE PANEL ======= */
+  .timeline-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+  }
+  .timeline-generate {
+    padding: 12px 16px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .timeline-generate:disabled { background: var(--text3); }
+
+  .timeline-item {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .timeline-line {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .timeline-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--text3);
+    flex-shrink: 0;
+  }
+  .timeline-dot.red { background: var(--flag-red); }
+  .timeline-dot.orange { background: var(--flag-orange); }
+  .timeline-dot.blue { background: var(--flag-blue); }
+  .timeline-connector {
+    width: 2px;
+    height: 50px;
+    background: var(--border);
+  }
+  .timeline-body {
+    flex: 1;
+    background: var(--surface);
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  .timeline-body-date { font-size: 11px; color: var(--text3); margin-bottom: 3px; }
+  .timeline-body-event { font-size: 14px; font-weight: 600; color: var(--text); }
+  .timeline-body-detail { font-size: 13px; color: var(--text2); margin-top: 4px; line-height: 1.5; }
+  .timeline-body-flags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+  .timeline-body-damage {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent);
+    margin-top: 6px;
+  }
+
+  .timeline-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+  }
+
+  .generate-loading {
+    padding: 20px;
+    text-align: center;
+    color: var(--text2);
+  }
+
+  /* ======= SUMMARY PANEL ======= */
+  .summary-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+  }
+  .summary-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .summary-card-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .summary-stat {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .summary-stat:last-child { border-bottom: none; }
+  .summary-stat-label { color: var(--text2); }
+  .summary-stat-val { font-weight: 600; color: var(--text); }
+  .summary-stat-val.red { color: var(--accent); }
+  .export-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 12px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    width: 100%;
+    margin-top: 12px;
+    font-size: 14px;
+  }
+  .progress-bar-wrap {
+    background: var(--surface2);
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 12px 0;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--primary);
+    transition: width 0.3s ease;
+  }
+  .progress-label { font-size: 11px; color: var(--text3); margin-top: 4px; }
+
+  .restore-banner {
+    background: var(--warning);
+    color: white;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    justify-content: space-between;
+  }
+  .restore-banner button {
+    background: rgba(255,255,255,0.3);
+    border: none;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+
+<!-- APP SHELL -->
+<div id="appShell" style="display:flex;flex-direction:column;flex:1;">
+
+<div class="header">
+  <div>
+    <div class="header-title">🏗️ Construction Dispute Case Builder</div>
+    <div class="header-sub">Interview & Analysis Tool</div>
+  </div>
+  <div class="header-actions">
+    <button class="header-btn" onclick="clearSession()" title="Start over">Clear</button>
+  </div>
+</div>
+
+<div id="restoreBanner" style="display:none">
+  <div class="restore-banner">
+    <span>Session data recovered</span>
+    <button onclick="dismissBanner()">Dismiss</button>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('chat')" id="tab-chat">💬 Interview</div>
+  <div class="tab" onclick="switchTab('flags')" id="tab-flags">🚩 Red Flags
+    <div class="tab-badge" id="flag-count" style="display:none">0</div>
+  </div>
+  <div class="tab" onclick="switchTab('timeline')" id="tab-timeline">⏰ Timeline</div>
+  <div class="tab" onclick="switchTab('summary')" id="tab-summary">📋 Summary</div>
+</div>
+
+<!-- CHAT PANEL -->
+<div class="panel active" id="panel-chat" style="position:relative">
+  <div class="chat-phase-banner">
+    <span class="phase-dot"></span>
+    <span class="phase-label">Phase: <span class="phase-name" id="phase-name">Initializing</span></span>
+  </div>
+  <div class="messages" id="messages"></div>
+  <div class="input-area" id="inputArea">
+    <div id="voiceStatus" class="voice-status" style="display:none">
+      <span id="voiceText">Listening...</span>
+    </div>
+    <div class="input-row">
+      <textarea id="inputBox" class="input-box" placeholder="Type your response or use voice..." onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+      <button id="voiceBtn" class="voice-btn" onclick="toggleVoice()" title="Voice input">🎤</button>
+      <button id="sendBtn" class="send-btn" onclick="sendMessage()" disabled>📤</button>
+    </div>
+  </div>
+</div>
+
+<!-- FLAGS PANEL -->
+<div class="panel" id="panel-flags">
+  <div class="flags-panel-content" id="flagsList">
+    <div class="flags-empty"><div class="flags-empty-icon">🚩</div><div style="font-size:15px;font-weight:600;color:var(--text2)">No flags yet</div><div style="font-size:13px">Potential violations will appear here as you share your story</div></div>
+  </div>
+</div>
+
+<!-- TIMELINE PANEL -->
+<div class="panel" id="panel-timeline">
+  <div class="timeline-content">
+    <button class="timeline-generate" id="generateBtn" onclick="generateTimeline()">▶ Generate Timeline</button>
+    <div id="timelineList">
+      <div class="timeline-empty"><div style="font-size:40px">⏰</div><div style="font-size:15px;font-weight:600;color:var(--text2)">No timeline yet</div><div style="font-size:13px">Complete the interview, then tap Generate Timeline</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- SUMMARY PANEL -->
+<div class="panel" id="panel-summary">
+  <div class="summary-content">
+    <div class="summary-card">
+      <div class="summary-card-title">Interview Progress</div>
+      <div class="summary-stat">
+        <span class="summary-stat-label">Messages exchanged:</span>
+        <span class="summary-stat-val" id="stat-msgs">0</span>
+      </div>
+      <div class="summary-stat">
+        <span class="summary-stat-label">Red flags identified:</span>
+        <span class="summary-stat-val red" id="stat-flags">0</span>
+      </div>
+      <div class="summary-stat">
+        <span class="summary-stat-label">Current phase:</span>
+        <span class="summary-stat-val" id="stat-phases">0 / 7</span>
+      </div>
+      <div class="summary-stat">
+        <span class="summary-stat-label">Session started:</span>
+        <span class="summary-stat-val" id="stat-started">-</span>
+      </div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="progressFill"></div>
+      </div>
+      <div class="progress-label" id="progressLabel">-</div>
+      <button class="export-btn" onclick="exportSession()">💾 Download Session</button>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-card-title">Financial Summary</div>
+      <div class="summary-stat">
+        <span class="summary-stat-label">Contract value:</span>
+        <span class="summary-stat-val" id="dmg-contract">Not entered</span>
+      </div>
+      <div class="summary-stat">
+        <span class="summary-stat-label">Amount paid:</span>
+        <span class="summary-stat-val" id="dmg-paid">Not entered</span>
+      </div>
+      <div class="summary-stat">
+        <span class="summary-stat-label">Repair cost:</span>
+        <span class="summary-stat-val" id="dmg-repair">Not entered</span>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-card-title">Session Info</div>
+      <div class="summary-stat">
+        <span class="summary-stat-label">Last saved:</span>
+        <span class="summary-stat-val" id="stat-saved">-</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'case_builder_session_v2';
+const API_ENDPOINT = '/.netlify/functions/chat';
+
+let state = {
+  messages: [],
+  flags: [],
+  timeline: [],
+  phaseIndex: 0,
+  sessionStart: new Date().toISOString(),
+  damages: { contract: null, paid: null, repair: null }
+};
+
+let isLoading = false;
+let recognition = null;
+let isListening = false;
+
+const PHASES = [
+  'Initial Contact & Referral',
+  'Contractor Representations & Contract',
+  'Work Commencement',
+  'First Problems Identified',
+  'Escalation & Additional Damage',
+  'Contractor Response & Corrections',
+  'Financial Impact & Final State'
+];
+
+const FLAG_COLORS = {
+  'State licensing violation': 'red',
+  'Contract law violation': 'red',
+  'Unlicensed activity': 'dark',
+  'Permit violation': 'purple',
+  'Negligent workmanship': 'orange',
+  'Failure of supervision': 'orange',
+  'Misrepresentation': 'red',
+  'Unauthorized subcontracting': 'blue',
+  'Code violation': 'yellow',
+  'Improper installation': 'orange',
+  'Damage escalation': 'red',
+  'Change order violation': 'blue',
+  'Failure to remedy defects': 'orange'
+};
+
+const FLAG_ICONS = {
+  red: '🔴',
+  orange: '🟠',
+  yellow: '🟡',
+  blue: '🔵',
+  purple: '🟣',
+  dark: '⚫'
+};
+
+const SYSTEM_PROMPT = `You are a structured case reconstruction interviewer helping a homeowner document a construction dispute for attorney review. Your role is to guide her through her story chronologically, ask memory-jogging follow-up questions, and help her recall details she may have forgotten.
+
+CURRENT PHASES:
+1. Initial Contact & Referral
+2. Contractor Representations & Contract  
+3. Work Commencement
+4. First Problems Identified
+5. Escalation & Additional Damage
+6. Contractor Response & Corrections
+7. Financial Impact & Final State
+
+RULES:
+- Never give legal advice or legal conclusions
+- Use phrases like "this may be relevant to your attorney" not "this is illegal"
+- Ask one clear question at a time
+- Be warm, patient, and encouraging
+- When you detect a potential issue, note it factually
+- Prompt for specific dates, amounts, names, and exact quotes when possible
+- When she mentions damages or costs, ask for specific dollar amounts
+
+RESPONSE FORMAT: Always respond in this exact JSON structure:
+{
+  "reply": "Your conversational response and next question here",
+  "phase": "Current phase name from the list above",
+  "phaseIndex": 0-6,
+  "flags": [
+    {"category": "Flag category name", "description": "What was said that triggered this flag"}
+  ],
+  "damageUpdate": {"contract": null, "paid": null, "repair": null}
+}
+
+Only include flags when you detect something genuinely relevant. Flags can include: State licensing violation, Contract law violation, Unlicensed activity, Permit violation, Negligent workmanship, Failure of supervision, Misrepresentation, Unauthorized subcontracting, Code violation, Improper installation, Damage escalation, Change order violation, Failure to remedy defects.
+
+Start by warmly introducing yourself and asking the first question about how she first heard about this contractor.`;
+
+function loadSession() {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      state = JSON.parse(stored);
+      return true;
+    }
+  } catch(e) {}
+  return false;
+}
+
+function saveSession() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    document.getElementById('stat-saved').textContent = new Date().toLocaleTimeString();
+  } catch(e) {}
+}
+
+function clearSession() {
+  if (!confirm('Clear all session data and start over? This cannot be undone.')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  state = {
+    messages: [],
+    flags: [],
+    timeline: [],
+    phaseIndex: 0,
+    sessionStart: new Date().toISOString(),
+    damages: { contract: null, paid: null, repair: null }
+  };
+  document.getElementById('messages').innerHTML = '';
+  document.getElementById('flagsList').innerHTML = `<div class="flags-empty"><div class="flags-empty-icon">🚩</div><div style="font-size:15px;font-weight:600;color:var(--text2)">No flags yet</div><div style="font-size:13px">Potential violations will appear here as you share your story</div></div>`;
+  document.getElementById('timelineList').innerHTML = `<div class="timeline-empty"><div style="font-size:40px">⏰</div><div style="font-size:15px;font-weight:600;color:var(--text2)">No timeline yet</div><div style="font-size:13px">Complete the interview, then tap Generate Timeline</div></div>`;
+  updateStats();
+  startInterview();
+}
+
+function dismissBanner() {
+  document.getElementById('restoreBanner').style.display = 'none';
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.getElementById('panel-' + tab).classList.add('active');
+}
+
+function renderAllMessages() {
+  const container = document.getElementById('messages');
+  container.innerHTML = '';
+  state.messages.forEach(m => appendMessageDOM(m));
+}
+
+function appendMessageDOM(msg) {
+  const container = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg ' + msg.role;
+  let flagsHtml = '';
+  if (msg.flags && msg.flags.length > 0) {
+    flagsHtml = '<div class="msg-flags">' + msg.flags.map(f => {
+      const color = FLAG_COLORS[f.category] || 'dark';
+      return `<span class="flag-chip ${color}">${FLAG_ICONS[color]} ${f.category}</span>`;
+    }).join('') + '</div>';
+  }
+  div.innerHTML = `<div class="msg-bubble">${msg.content}</div>${flagsHtml}<div class="msg-time">${msg.time || ''}</div>`;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function renderFlags() {
+  const container = document.getElementById('flagsList');
+  if (state.flags.length === 0) {
+    container.innerHTML = `<div class="flags-empty"><div class="flags-empty-icon">🚩</div><div style="font-size:15px;font-weight:600;color:var(--text2)">No flags yet</div><div style="font-size:13px">Potential violations will appear here as you share your story</div></div>`;
+    return;
+  }
+  container.innerHTML = state.flags.map(f => {
+    const color = FLAG_COLORS[f.category] || 'dark';
+    return `<div class="flag-card ${color}"><div class="flag-card-header"><span class="flag-card-icon">${FLAG_ICONS[color]}</span><span class="flag-card-cat">${f.category}</span><span class="flag-card-time">${f.time}</span></div><div class="flag-card-desc">${f.description}</div></div>`;
+  }).join('');
+  const badge = document.getElementById('flag-count');
+  badge.textContent = state.flags.length;
+  badge.style.display = 'flex';
+}
+
+function updateStats() {
+  const userMsgs = state.messages.filter(m => m.role === 'user').length;
+  document.getElementById('stat-msgs').textContent = userMsgs;
+  document.getElementById('stat-flags').textContent = state.flags.length;
+  document.getElementById('stat-phases').textContent = (state.phaseIndex + 1) + ' / 7';
+  document.getElementById('stat-started').textContent = new Date(state.sessionStart).toLocaleDateString();
+  document.getElementById('phase-name').textContent = PHASES[state.phaseIndex] || PHASES[0];
+  const pct = Math.round((state.phaseIndex / 7) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = `Phase ${state.phaseIndex + 1} of 7 — ${PHASES[state.phaseIndex] || PHASES[0]}`;
+  const d = state.damages;
+  document.getElementById('dmg-contract').textContent = d.contract ? '$' + d.contract.toLocaleString() : 'Not entered';
+  document.getElementById('dmg-paid').textContent = d.paid ? '$' + d.paid.toLocaleString() : 'Not entered';
+  document.getElementById('dmg-repair').textContent = d.repair ? '$' + d.repair.toLocaleString() : 'Not entered';
+}
+
+function showTyping() {
+  const container = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg ai';
+  div.id = 'typing-indicator';
+  div.innerHTML = `<div class="typing"><span></span><span></span><span></span></div>`;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function removeTyping() {
+  const el = document.getElementById('typing-indicator');
+  if (el) el.remove();
+}
+
+async function callAI(userText) {
+  const apiMessages = [];
+  state.messages.forEach(m => {
+    apiMessages.push({ role: m.role === 'ai' ? 'assistant' : 'user', content: m.content });
+  });
+  if (userText) apiMessages.push({ role: 'user', content: userText });
+
+  const response = await fetch(API_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'claude-3-5-sonnet-20241022',
+      max_tokens: 1024,
+      system: SYSTEM_PROMPT,
+      messages: apiMessages
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error('API error: ' + response.status);
+  }
+  const data = await response.json();
+  const text = data.content[0].text;
+  try {
+    const clean = text.replace(/```json|```/g, '').trim();
+    return JSON.parse(clean);
+  } catch(e) {
+    console.error('Parse error:', e);
+    return null;
+  }
+}
+
+async function startInterview() {
+  if (state.messages.length > 0) { renderAllMessages(); renderFlags(); updateStats(); return; }
+  isLoading = true;
+  showTyping();
+  try {
+    const result = await callAI();
+    if (result && result.reply) {
+      removeTyping();
+      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const aiMsg = { role: 'ai', content: result.reply, time, flags: result.flags || [] };
+      state.messages.push(aiMsg);
+      if (result.phaseIndex !== undefined) state.phaseIndex = result.phaseIndex;
+      appendMessageDOM(aiMsg);
+      addFlags(result.flags || [], time);
+      saveSession();
+    }
+    updateStats();
+  } catch(e) {
+    removeTyping();
+    console.error('Interview start error:', e);
+    appendMessageDOM({ role: 'ai', content: 'Sorry, I encountered an error. Please refresh and try again.' });
+  }
+  isLoading = false;
+}
+
+async function sendMessage() {
+  if (isLoading) return;
+  const input = document.getElementById('inputBox');
+  const text = input.value.trim();
+  if (!text) return;
+
+  input.value = '';
+  input.style.height = 'auto';
+  document.getElementById('sendBtn').disabled = true;
+
+  const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const userMsg = { role: 'user', content: text, time, flags: [] };
+  state.messages.push(userMsg);
+  appendMessageDOM(userMsg);
+
+  isLoading = true;
+  showTyping();
+
+  try {
+    const result = await callAI(text);
+    if (result && result.reply) {
+      removeTyping();
+      const aiMsg = { role: 'ai', content: result.reply, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), flags: result.flags || [] };
+      state.messages.push(aiMsg);
+      if (result.phaseIndex !== undefined) state.phaseIndex = result.phaseIndex;
+      if (result.damageUpdate) {
+        if (result.damageUpdate.contract) state.damages.contract = result.damageUpdate.contract;
+        if (result.damageUpdate.paid) state.damages.paid = result.damageUpdate.paid;
+        if (result.damageUpdate.repair) state.damages.repair = result.damageUpdate.repair;
+      }
+      appendMessageDOM(aiMsg);
+      addFlags(result.flags || [], aiMsg.time);
+      saveSession();
+    }
+    renderFlags();
+  } catch(e) {
+    removeTyping();
+    console.error('Send error:', e);
+    appendMessageDOM({ role: 'ai', content: 'Sorry, I encountered an error sending your message. Please try again.' });
+  }
+  isLoading = false;
+}
+
+function addFlags(newFlags, time) {
+  newFlags.forEach(f => {
+    const exists = state.flags.some(flag => flag.category === f.category && flag.description === f.description);
+    if (!exists) state.flags.push({ ...f, time });
+  });
+}
+
+async function generateTimeline() {
+  if (state.messages.length < 4) {
+    alert('Please have at least a few back-and-forth exchanges first.');
+    return;
+  }
+  const btn = document.getElementById('generateBtn');
+  btn.disabled = true;
+  btn.textContent = 'Generating...';
+  document.getElementById('timelineList').innerHTML = '<div class="generate-loading">⏳ Analyzing your story and building the timeline...<br><br>This may take 20-30 seconds.</div>';
+
+  const transcript = state.messages.map(m => `[${m.role.toUpperCase()}]: ${m.content}`).join('\n\n');
+
+  try {
+    const response = await fetch(API_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'claude-3-5-sonnet-20241022',
+        max_tokens: 2000,
+        system: `You are a timeline analyzer for construction disputes. Look at the interview transcript below and create a structured chronological timeline of events, flagging critical incidents and damages. Response must be ONLY a JSON array in this exact format:
+[{
+  "date": "Date or time period (e.g. 'March 2024' or 'Week 3 of project')",
+  "event": "Short event title",
+  "detail": "Full description of what happened",
+  "flags": ["Category names of any violations"],
+  "dotColor": "red/orange/blue/normal",
+  "damage": "Dollar amount if mentioned, else null"
+}]
+
+Transcript:
+${transcript}`,
+        messages: [{ role: 'user', content: 'Create the timeline.' }]
+      })
+    });
+    const data = await response.json();
+    const text = data.content[0].text;
+    const clean = text.replace(/```json|```/g, '').trim();
+    const items = JSON.parse(clean);
+    state.timeline = items;
+    saveSession();
+    renderTimeline();
+  } catch(e) {
+    console.error('Timeline error:', e);
+  }
+  btn.disabled = false;
+  btn.textContent = '▶ Regenerate Timeline';
+}
+
+function renderTimeline() {
+  const container = document.getElementById('timelineList');
+  if (!state.timeline || state.timeline.length === 0) {
+    container.innerHTML = `<div class="timeline-empty"><div style="font-size:40px">⏰</div><div style="font-size:15px;font-weight:600;color:var(--text2)">No timeline yet</div><div style="font-size:13px">Complete the interview, then tap Generate Timeline</div></div>`;
+    return;
+  }
+  container.innerHTML = state.timeline.map((item, i) => {
+    const connector = i < state.timeline.length - 1 ? '<div class="timeline-connector"></div>' : '';
+    const flagsHtml = item.flags && item.flags.length > 0 ? '<div class="timeline-body-flags">' + item.flags.map(f => {
+      const color = FLAG_COLORS[f] || 'dark';
+      return `<span class="flag-chip ${color}">${FLAG_ICONS[color]} ${f}</span>`;
+    }).join('') + '</div>' : '';
+    const damageHtml = item.damage ? `<div class="timeline-body-damage">💰 ${item.damage}</div>` : '';
+    return `<div class="timeline-item">
+      <div class="timeline-line">
+        <div class="timeline-dot ${item.dotColor || 'normal'}"></div>
+        ${connector}
+      </div>
+      <div class="timeline-body">
+        <div class="timeline-body-date">${item.date}</div>
+        <div class="timeline-body-event">${item.event}</div>
+        <div class="timeline-body-detail">${item.detail}</div>
+        ${flagsHtml}
+        ${damageHtml}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function exportSession() {
+  const data = {
+    exportedAt: new Date().toISOString(),
+    sessionStart: state.sessionStart,
+    totalMessages: state.messages.length,
+    totalFlags: state.flags.length,
+    damages: state.damages,
+    messages: state.messages,
+    flags: state.flags,
+    timeline: state.timeline
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'case_backup_' + new Date().toISOString().split('T')[0] + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+  document.getElementById('sendBtn').disabled = el.value.trim() === '';
+}
+
+function toggleVoice() {
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    alert('Speech recognition not supported in your browser.');
+    return;
+  }
+  if (isListening) { stopVoice(); return; }
+  startVoice();
+}
+
+function startVoice() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SpeechRecognition();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
+
+  const btn = document.getElementById('voiceBtn');
+  const status = document.getElementById('voiceStatus');
+  const input = document.getElementById('inputBox');
+
+  recognition.onstart = () => {
+    isListening = true;
+    btn.classList.add('listening');
+    status.style.display = 'flex';
+    status.querySelector('#voiceText').textContent = 'Listening...';
+  };
+
+  recognition.onresult = (e) => {
+    let interimTranscript = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const transcript = e.results[i][0].transcript;
+      if (e.results[i].isFinal) {
+        input.value += transcript + ' ';
+      } else {
+        interimTranscript += transcript;
+      }
+    }
+    status.querySelector('#voiceText').textContent = 'Listening' + (interimTranscript ? ': ' + interimTranscript : '') + '...';
+    autoResize(input);
+  };
+
+  recognition.onend = () => {
+    isListening = false;
+    btn.classList.remove('listening');
+    status.style.display = 'none';
+  };
+
+  recognition.onerror = (e) => {
+    status.querySelector('#voiceText').textContent = 'Error: ' + e.error;
+  };
+
+  recognition.start();
+}
+
+function stopVoice() {
+  if (recognition) recognition.stop();
+}
+
+// Init
+const hadSession = loadSession();
+renderAllMessages();
+renderFlags();
+renderTimeline();
+updateStats();
+if (hadSession) {
+  document.getElementById('restoreBanner').style.display = 'block';
+}
+startInterview();
+</script>
+</div><!-- end appShell -->
+</body>
+</html>

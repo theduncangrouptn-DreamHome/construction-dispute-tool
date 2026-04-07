@@ -1,0 +1,20 @@
+{
+  "name": "construction-dispute-netlify",
+  "version": "1.0.0",
+  "description": "AI-powered construction dispute interview tool deployed on Netlify",
+  "main": "index.html",
+  "scripts": {
+    "dev": "netlify dev",
+    "build": "echo 'Build is not required for this static site'",
+    "test": "echo 'No tests configured'"
+  },
+  "keywords": [
+    "construction",
+    "dispute",
+    "ai",
+    "interview"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {}
+}
