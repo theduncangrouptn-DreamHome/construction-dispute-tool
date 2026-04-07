@@ -2,8 +2,3 @@
   command = "echo 'No build required for this static site'"
   functions = "netlify/functions"
   publish = "."
-
-[[redirects]]
-  from = "/.netlify/functions/chat"
-  to = "/.netlify/functions/chat"
-  status = 200
