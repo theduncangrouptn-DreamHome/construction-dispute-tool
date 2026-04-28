@@ -485,6 +485,195 @@
     font-weight: 600;
     font-size: 12px;
   }
+
+  /* ======= VIDEO PANEL ======= */
+  .video-panel-content {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  .video-upload-area {
+    margin: 16px;
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    background: var(--surface);
+    color: var(--text2);
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .video-upload-area:hover,
+  .video-upload-area.drag-over {
+    border-color: var(--primary-light);
+    background: var(--surface2);
+  }
+  .video-upload-icon { font-size: 48px; margin-bottom: 12px; }
+  .video-upload-text { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .video-upload-sub { font-size: 12px; color: var(--text3); }
+
+  .video-player-area {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  #videoEl {
+    width: 100%;
+    max-height: 240px;
+    background: #000;
+    object-fit: contain;
+  }
+  .video-controls-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .vc-btn {
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text);
+    white-space: nowrap;
+  }
+  .vc-btn:hover { background: var(--surface2); }
+  .vc-btn.primary { background: var(--primary); color: white; border-color: var(--primary); }
+  .vc-btn.primary:hover { background: var(--primary-light); }
+  .vc-btn.accent { background: var(--accent); color: white; border-color: var(--accent); }
+  .vc-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .vc-time { font-size: 12px; color: var(--text2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .vc-spacer { flex: 1; }
+
+  .scrubber-wrap {
+    padding: 6px 12px 10px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+  .scrubber-bar {
+    position: relative;
+    height: 28px;
+    background: var(--surface2);
+    border-radius: 4px;
+    cursor: pointer;
+    overflow: visible;
+    user-select: none;
+  }
+  .trim-region {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    background: rgba(26, 58, 92, 0.18);
+    border-top: 2px solid var(--primary);
+    border-bottom: 2px solid var(--primary);
+    pointer-events: none;
+  }
+  .trim-handle {
+    position: absolute;
+    top: 0;
+    width: 10px;
+    height: 100%;
+    background: var(--primary);
+    border-radius: 3px;
+    cursor: ew-resize;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translateX(-50%);
+  }
+  .trim-handle::after {
+    content: '';
+    display: block;
+    width: 2px;
+    height: 12px;
+    background: rgba(255,255,255,0.6);
+    border-radius: 1px;
+  }
+  .scrubber-playhead {
+    position: absolute;
+    top: -4px;
+    width: 2px;
+    height: calc(100% + 8px);
+    background: var(--accent);
+    pointer-events: none;
+    z-index: 3;
+    transform: translateX(-50%);
+  }
+  .scrubber-playhead::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -4px;
+    width: 10px;
+    height: 10px;
+    background: var(--accent);
+    border-radius: 50%;
+  }
+
+  .trim-info-row {
+    display: flex;
+    gap: 16px;
+    padding: 6px 12px;
+    font-size: 11px;
+    color: var(--text2);
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .trim-info-item { display: flex; gap: 4px; align-items: center; }
+  .trim-info-label { color: var(--text3); }
+  .trim-info-val { font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; }
+
+  .export-status {
+    padding: 8px 12px;
+    font-size: 12px;
+    color: var(--text2);
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    display: none;
+  }
+
+  .frames-section {
+    flex: 1;
+    padding: 12px;
+    overflow-y: auto;
+  }
+  .frames-section-title { font-size: 13px; font-weight: 600; color: var(--text2); margin-bottom: 8px; }
+  .frames-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 8px;
+  }
+  .frame-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .frame-card img { width: 100%; display: block; }
+  .frame-card-footer {
+    padding: 4px 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .frame-time { font-size: 10px; color: var(--text3); }
+  .frame-dl-btn {
+    font-size: 10px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--primary);
+    font-weight: 600;
+  }
 </style>
 </head>
 <body>
@@ -516,6 +705,7 @@
   </div>
   <div class="tab" onclick="switchTab('timeline')" id="tab-timeline">⏰ Timeline</div>
   <div class="tab" onclick="switchTab('summary')" id="tab-summary">📋 Summary</div>
+  <div class="tab" onclick="switchTab('video')" id="tab-video">🎬 Video</div>
 </div>
 
 <!-- CHAT PANEL -->
@@ -603,6 +793,77 @@
       <div class="summary-stat">
         <span class="summary-stat-label">Last saved:</span>
         <span class="summary-stat-val" id="stat-saved">-</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- VIDEO PANEL -->
+<div class="panel" id="panel-video">
+  <div class="video-panel-content">
+    <div id="videoUploadArea" class="video-upload-area"
+         onclick="document.getElementById('videoFileInput').click()"
+         ondragover="videoDragOver(event)" ondragleave="videoDragLeave(event)" ondrop="videoDrop(event)">
+      <input type="file" id="videoFileInput" accept="video/*" style="display:none" onchange="videoFileSelected(event)">
+      <div class="video-upload-icon">🎬</div>
+      <div class="video-upload-text">Upload a video to edit</div>
+      <div class="video-upload-sub">Drag &amp; drop or click to select · MP4, MOV, WebM, AVI</div>
+    </div>
+
+    <div class="video-player-area" id="videoPlayerArea" style="display:none">
+      <video id="videoEl" preload="metadata"
+             ontimeupdate="videoTimeUpdate()"
+             onloadedmetadata="videoLoaded()"
+             onended="videoPaused()"></video>
+
+      <div class="scrubber-wrap">
+        <div class="scrubber-bar" id="scrubberBar"
+             onmousedown="scrubberClick(event)"
+             ontouchstart="scrubberTap(event)">
+          <div class="trim-region" id="trimRegion"></div>
+          <div class="trim-handle" id="inHandle"
+               onmousedown="handleDragStart(event,'in')"
+               ontouchstart="handleTouchStart(event,'in')"></div>
+          <div class="trim-handle" id="outHandle"
+               onmousedown="handleDragStart(event,'out')"
+               ontouchstart="handleTouchStart(event,'out')"></div>
+          <div class="scrubber-playhead" id="scrubberPlayhead" style="left:0%"></div>
+        </div>
+      </div>
+
+      <div class="video-controls-row">
+        <button class="vc-btn primary" id="playPauseBtn" onclick="togglePlayVideo()">▶ Play</button>
+        <span class="vc-time"><span id="vcCurrentTime">0:00</span> / <span id="vcDuration">0:00</span></span>
+        <div class="vc-spacer"></div>
+        <button class="vc-btn" onclick="setTrimIn()" title="Mark current position as clip start">⬅ Set In</button>
+        <button class="vc-btn" onclick="setTrimOut()" title="Mark current position as clip end">Set Out ➡</button>
+        <button class="vc-btn" onclick="captureFrame()" title="Save current frame as image">📷 Frame</button>
+        <button class="vc-btn accent" id="exportBtn" onclick="exportClip()">💾 Export Clip</button>
+        <button class="vc-btn" onclick="changeVideo()">📂</button>
+      </div>
+
+      <div class="trim-info-row">
+        <div class="trim-info-item">
+          <span class="trim-info-label">In:</span>
+          <span class="trim-info-val" id="trimInDisplay">0:00</span>
+        </div>
+        <div class="trim-info-item">
+          <span class="trim-info-label">Out:</span>
+          <span class="trim-info-val" id="trimOutDisplay">—</span>
+        </div>
+        <div class="trim-info-item">
+          <span class="trim-info-label">Clip length:</span>
+          <span class="trim-info-val" id="trimDurDisplay">—</span>
+        </div>
+      </div>
+
+      <div class="export-status" id="exportStatus"></div>
+
+      <div class="frames-section">
+        <div class="frames-section-title">Captured Frames</div>
+        <div class="frames-grid" id="framesGrid">
+          <div id="framesEmpty" style="font-size:12px;color:var(--text3);grid-column:1/-1">No frames yet. Press 📷 Frame to capture the current frame.</div>
+        </div>
       </div>
     </div>
   </div>
@@ -735,11 +996,16 @@ function dismissBanner() {
   document.getElementById('restoreBanner').style.display = 'none';
 }
 
+let videoTabOpened = false;
 function switchTab(tab) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.getElementById('tab-' + tab).classList.add('active');
   document.getElementById('panel-' + tab).classList.add('active');
+  if (tab === 'video' && !videoTabOpened) {
+    videoTabOpened = true;
+    loadDefaultVideo();
+  }
 }
 
 function renderAllMessages() {
@@ -1087,6 +1353,312 @@ function startVoice() {
 
 function stopVoice() {
   if (recognition) recognition.stop();
+}
+
+// ======= VIDEO EDITOR =======
+let vid = {
+  duration: 0,
+  trimIn: 0,
+  trimOut: 0,
+  isPlaying: false,
+  dragging: null,
+  dragStartX: 0,
+  dragStartVal: 0,
+  objectUrl: null,
+  recording: false
+};
+
+function videoFileSelected(e) {
+  const file = e.target.files[0];
+  if (file) loadVideoFile(file);
+}
+
+function videoDragOver(e) {
+  e.preventDefault();
+  document.getElementById('videoUploadArea').classList.add('drag-over');
+}
+
+function videoDragLeave() {
+  document.getElementById('videoUploadArea').classList.remove('drag-over');
+}
+
+function videoDrop(e) {
+  e.preventDefault();
+  document.getElementById('videoUploadArea').classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('video/')) loadVideoFile(file);
+}
+
+function changeVideo() {
+  document.getElementById('videoFileInput').click();
+}
+
+function loadVideoFile(file) {
+  if (vid.objectUrl) URL.revokeObjectURL(vid.objectUrl);
+  vid.objectUrl = URL.createObjectURL(file);
+  const videoEl = document.getElementById('videoEl');
+  videoEl.src = vid.objectUrl;
+  document.getElementById('videoUploadArea').style.display = 'none';
+  document.getElementById('videoPlayerArea').style.display = 'flex';
+}
+
+function videoLoaded() {
+  const videoEl = document.getElementById('videoEl');
+  vid.duration = videoEl.duration;
+  vid.trimIn = 0;
+  vid.trimOut = vid.duration;
+  updateScrubberUI();
+  updateTrimInfo();
+  document.getElementById('vcDuration').textContent = fmtTime(vid.duration);
+}
+
+function loadDefaultVideo() {
+  const videoEl = document.getElementById('videoEl');
+  videoEl.src = 'assets/site-video.mp4';
+  document.getElementById('videoUploadArea').style.display = 'none';
+  document.getElementById('videoPlayerArea').style.display = 'flex';
+}
+
+function videoTimeUpdate() {
+  const videoEl = document.getElementById('videoEl');
+  const t = videoEl.currentTime;
+  document.getElementById('vcCurrentTime').textContent = fmtTime(t);
+  if (vid.duration > 0) {
+    document.getElementById('scrubberPlayhead').style.left = (t / vid.duration * 100) + '%';
+  }
+}
+
+function videoPaused() {
+  vid.isPlaying = false;
+  document.getElementById('playPauseBtn').textContent = '▶ Play';
+}
+
+function togglePlayVideo() {
+  const videoEl = document.getElementById('videoEl');
+  if (vid.isPlaying) {
+    videoEl.pause();
+    vid.isPlaying = false;
+    document.getElementById('playPauseBtn').textContent = '▶ Play';
+  } else {
+    if (videoEl.currentTime >= vid.trimOut) videoEl.currentTime = vid.trimIn;
+    videoEl.play();
+    vid.isPlaying = true;
+    document.getElementById('playPauseBtn').textContent = '⏸ Pause';
+  }
+}
+
+function setTrimIn() {
+  vid.trimIn = document.getElementById('videoEl').currentTime;
+  if (vid.trimIn >= vid.trimOut) vid.trimOut = Math.min(vid.trimIn + 1, vid.duration);
+  updateScrubberUI();
+  updateTrimInfo();
+}
+
+function setTrimOut() {
+  vid.trimOut = document.getElementById('videoEl').currentTime;
+  if (vid.trimOut <= vid.trimIn) vid.trimIn = Math.max(vid.trimOut - 1, 0);
+  updateScrubberUI();
+  updateTrimInfo();
+}
+
+function updateScrubberUI() {
+  if (vid.duration <= 0) return;
+  const inPct = (vid.trimIn / vid.duration) * 100;
+  const outPct = (vid.trimOut / vid.duration) * 100;
+  document.getElementById('inHandle').style.left = inPct + '%';
+  document.getElementById('outHandle').style.left = outPct + '%';
+  const region = document.getElementById('trimRegion');
+  region.style.left = inPct + '%';
+  region.style.width = (outPct - inPct) + '%';
+}
+
+function updateTrimInfo() {
+  document.getElementById('trimInDisplay').textContent = fmtTime(vid.trimIn);
+  document.getElementById('trimOutDisplay').textContent = fmtTime(vid.trimOut);
+  const dur = vid.trimOut - vid.trimIn;
+  document.getElementById('trimDurDisplay').textContent = dur > 0 ? fmtTime(dur) : '—';
+}
+
+function scrubberClick(e) {
+  if (e.target === document.getElementById('inHandle') || e.target === document.getElementById('outHandle')) return;
+  const rect = document.getElementById('scrubberBar').getBoundingClientRect();
+  const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  document.getElementById('videoEl').currentTime = pct * vid.duration;
+}
+
+function scrubberTap(e) {
+  if (e.target === document.getElementById('inHandle') || e.target === document.getElementById('outHandle')) return;
+  const rect = document.getElementById('scrubberBar').getBoundingClientRect();
+  const pct = Math.max(0, Math.min(1, (e.touches[0].clientX - rect.left) / rect.width));
+  document.getElementById('videoEl').currentTime = pct * vid.duration;
+}
+
+function handleDragStart(e, type) {
+  e.stopPropagation();
+  e.preventDefault();
+  vid.dragging = type;
+  vid.dragStartX = e.clientX;
+  vid.dragStartVal = type === 'in' ? vid.trimIn : vid.trimOut;
+  document.addEventListener('mousemove', handleDragMove);
+  document.addEventListener('mouseup', handleDragEnd);
+}
+
+function handleTouchStart(e, type) {
+  e.stopPropagation();
+  e.preventDefault();
+  vid.dragging = type;
+  vid.dragStartX = e.touches[0].clientX;
+  vid.dragStartVal = type === 'in' ? vid.trimIn : vid.trimOut;
+  document.addEventListener('touchmove', handleTouchMove, { passive: false });
+  document.addEventListener('touchend', handleDragEnd);
+}
+
+function handleDragMove(e) {
+  if (!vid.dragging || vid.duration <= 0) return;
+  const rect = document.getElementById('scrubberBar').getBoundingClientRect();
+  const delta = (e.clientX - vid.dragStartX) / rect.width * vid.duration;
+  const newVal = Math.max(0, Math.min(vid.duration, vid.dragStartVal + delta));
+  if (vid.dragging === 'in') {
+    vid.trimIn = Math.min(newVal, vid.trimOut - 0.1);
+  } else {
+    vid.trimOut = Math.max(newVal, vid.trimIn + 0.1);
+  }
+  updateScrubberUI();
+  updateTrimInfo();
+}
+
+function handleTouchMove(e) {
+  e.preventDefault();
+  if (!vid.dragging || vid.duration <= 0) return;
+  const rect = document.getElementById('scrubberBar').getBoundingClientRect();
+  const delta = (e.touches[0].clientX - vid.dragStartX) / rect.width * vid.duration;
+  const newVal = Math.max(0, Math.min(vid.duration, vid.dragStartVal + delta));
+  if (vid.dragging === 'in') {
+    vid.trimIn = Math.min(newVal, vid.trimOut - 0.1);
+  } else {
+    vid.trimOut = Math.max(newVal, vid.trimIn + 0.1);
+  }
+  updateScrubberUI();
+  updateTrimInfo();
+}
+
+function handleDragEnd() {
+  vid.dragging = null;
+  document.removeEventListener('mousemove', handleDragMove);
+  document.removeEventListener('mouseup', handleDragEnd);
+  document.removeEventListener('touchmove', handleTouchMove);
+  document.removeEventListener('touchend', handleDragEnd);
+}
+
+function captureFrame() {
+  const videoEl = document.getElementById('videoEl');
+  const canvas = document.createElement('canvas');
+  canvas.width = videoEl.videoWidth;
+  canvas.height = videoEl.videoHeight;
+  canvas.getContext('2d').drawImage(videoEl, 0, 0);
+  const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+  const t = videoEl.currentTime;
+  const grid = document.getElementById('framesGrid');
+  const empty = document.getElementById('framesEmpty');
+  if (empty) empty.remove();
+
+  const frameId = 'frame_' + Date.now();
+  const card = document.createElement('div');
+  card.className = 'frame-card';
+  card.id = frameId;
+  card.innerHTML = `<img src="${dataUrl}" alt="Frame at ${fmtTime(t)}"><div class="frame-card-footer"><span class="frame-time">${fmtTime(t)}</span><button class="frame-dl-btn" onclick="downloadFrame('${frameId}')">⬇ Save</button></div>`;
+  grid.appendChild(card);
+}
+
+function downloadFrame(frameId) {
+  const img = document.getElementById(frameId).querySelector('img');
+  const a = document.createElement('a');
+  a.href = img.src;
+  a.download = 'frame_' + new Date().toISOString().replace(/[:.]/g, '-') + '.jpg';
+  a.click();
+}
+
+async function exportClip() {
+  if (vid.recording) return;
+  const videoEl = document.getElementById('videoEl');
+  const duration = vid.trimOut - vid.trimIn;
+  if (duration <= 0.1) {
+    alert('Please set valid In/Out trim points first.');
+    return;
+  }
+
+  const status = document.getElementById('exportStatus');
+  status.style.display = 'block';
+  status.textContent = '⏳ Recording clip in real time... (' + fmtTime(duration) + ')';
+  document.getElementById('exportBtn').disabled = true;
+
+  try {
+    let stream;
+    if (videoEl.captureStream) stream = videoEl.captureStream();
+    else if (videoEl.mozCaptureStream) stream = videoEl.mozCaptureStream();
+    else {
+      status.textContent = '❌ Video capture not supported. Try Chrome or Edge.';
+      document.getElementById('exportBtn').disabled = false;
+      return;
+    }
+
+    const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
+      ? 'video/webm;codecs=vp9'
+      : 'video/webm';
+
+    const recorder = new MediaRecorder(stream, { mimeType });
+    const chunks = [];
+    vid.recording = true;
+
+    recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+    recorder.onstop = () => {
+      vid.recording = false;
+      const blob = new Blob(chunks, { type: 'video/webm' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'clip_' + fmtTime(vid.trimIn).replace(':', 'm') + 's_to_' + fmtTime(vid.trimOut).replace(':', 'm') + 's.webm';
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+      status.textContent = '✅ Clip exported!';
+      setTimeout(() => { status.style.display = 'none'; }, 4000);
+      document.getElementById('exportBtn').disabled = false;
+    };
+
+    videoEl.currentTime = vid.trimIn;
+    await new Promise(resolve => { videoEl.onseeked = resolve; });
+
+    recorder.start(100);
+    videoEl.play();
+    vid.isPlaying = true;
+    document.getElementById('playPauseBtn').textContent = '⏸ Pause';
+
+    const checkEnd = () => {
+      if (!vid.recording) return;
+      if (videoEl.currentTime >= vid.trimOut) {
+        videoEl.pause();
+        vid.isPlaying = false;
+        document.getElementById('playPauseBtn').textContent = '▶ Play';
+        recorder.stop();
+      } else {
+        requestAnimationFrame(checkEnd);
+      }
+    };
+    requestAnimationFrame(checkEnd);
+
+  } catch (e) {
+    console.error('Export error:', e);
+    status.textContent = '❌ Export failed: ' + e.message;
+    document.getElementById('exportBtn').disabled = false;
+    vid.recording = false;
+  }
+}
+
+function fmtTime(s) {
+  if (!isFinite(s) || s < 0) return '0:00';
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
+  return m + ':' + String(sec).padStart(2, '0');
 }
 
 // Init
