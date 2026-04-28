@@ -862,7 +862,7 @@
       <div class="frames-section">
         <div class="frames-section-title">Captured Frames</div>
         <div class="frames-grid" id="framesGrid">
-          <div style="font-size:12px;color:var(--text3);grid-column:1/-1">No frames yet. Press 📷 Frame to capture the current frame.</div>
+          <div id="framesEmpty" style="font-size:12px;color:var(--text3);grid-column:1/-1">No frames yet. Press 📷 Frame to capture the current frame.</div>
         </div>
       </div>
     </div>
@@ -996,11 +996,16 @@ function dismissBanner() {
   document.getElementById('restoreBanner').style.display = 'none';
 }
 
+let videoTabOpened = false;
 function switchTab(tab) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.getElementById('tab-' + tab).classList.add('active');
   document.getElementById('panel-' + tab).classList.add('active');
+  if (tab === 'video' && !videoTabOpened) {
+    videoTabOpened = true;
+    loadDefaultVideo();
+  }
 }
 
 function renderAllMessages() {
@@ -1407,6 +1412,13 @@ function videoLoaded() {
   document.getElementById('vcDuration').textContent = fmtTime(vid.duration);
 }
 
+function loadDefaultVideo() {
+  const videoEl = document.getElementById('videoEl');
+  videoEl.src = 'assets/site-video.mp4';
+  document.getElementById('videoUploadArea').style.display = 'none';
+  document.getElementById('videoPlayerArea').style.display = 'flex';
+}
+
 function videoTimeUpdate() {
   const videoEl = document.getElementById('videoEl');
   const t = videoEl.currentTime;
@@ -1547,7 +1559,8 @@ function captureFrame() {
   const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
   const t = videoEl.currentTime;
   const grid = document.getElementById('framesGrid');
-  if (grid.querySelector('[style]')) grid.innerHTML = '';
+  const empty = document.getElementById('framesEmpty');
+  if (empty) empty.remove();
 
   const frameId = 'frame_' + Date.now();
   const card = document.createElement('div');
