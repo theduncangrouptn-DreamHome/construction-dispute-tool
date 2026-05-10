@@ -2,6 +2,26 @@
 
 This is an AI-powered construction dispute interview tool that runs on Netlify with a serverless backend.
 
+## Table of Contents
+
+- [Project Structure](#project-structure)
+- [Key Changes from Original](#key-changes-from-original)
+- [Prerequisites](#prerequisites)
+- [Local Development](#local-development)
+- [Deployment to Netlify via GitHub](#deployment-to-netlify-via-github)
+  - [Step 1: Create GitHub Repository](#step-1-create-github-repository)
+  - [Step 2: Connect GitHub to Netlify](#step-2-connect-github-to-netlify)
+  - [Step 3: Add Environment Variables](#step-3-add-environment-variables)
+  - [Step 4: Deploy](#step-4-deploy)
+- [How It Works](#how-it-works)
+- [Environment Variables Reference](#environment-variables-reference)
+- [Features](#features)
+- [Development Workflow](#development-workflow)
+- [Troubleshooting](#troubleshooting)
+- [Security Notes](#security-notes)
+- [Support](#support)
+- [API Limits](#api-limits)
+
 ## Project Structure
 
 ```
