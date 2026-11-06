@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flipbook Maker</title>
+<style>
+  :root { --bg:#14171f; --panel:#1e2330; --fg:#eef1f7; --muted:#9aa3b5; --accent:#ff6b35; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:system-ui,-apple-system,Segoe UI,sans-serif; background:var(--bg); color:var(--fg); min-height:100vh; display:flex; flex-direction:column; }
+  header { padding:14px 20px; display:flex; align-items:center; gap:12px; background:var(--panel); }
+  header h1 { font-size:18px; margin:0; flex:1; }
+  button, .btn { background:var(--accent); color:#fff; border:0; border-radius:8px; padding:9px 16px; font-size:14px; cursor:pointer; }
+  button.ghost { background:#2d3447; }
+  button:disabled { opacity:.4; cursor:default; }
+  #drop { margin:auto; width:min(560px,92vw); border:2px dashed #3b4258; border-radius:16px; padding:48px 24px; text-align:center; transition:.15s; }
+  #drop.over { border-color:var(--accent); background:#1b2030; }
+  #drop p { color:var(--muted); margin:8px 0 20px; }
+  #stage { flex:1; display:none; align-items:center; justify-content:center; padding:16px; overflow:hidden; }
+  #book { margin:auto; }
+  .page { background:#fff; }
+  .page img { width:100%; height:100%; display:block; object-fit:contain; }
+  #bar { display:none; justify-content:center; align-items:center; gap:10px; padding:12px; background:var(--panel); flex-wrap:wrap; }
+  #count { min-width:90px; text-align:center; color:var(--muted); font-size:14px; }
+  #status { position:fixed; inset:0; background:rgba(10,12,18,.8); display:none; align-items:center; justify-content:center; font-size:18px; z-index:9; }
+</style>
+</head>
+<body>
+<header>
+  <h1>📖 Flipbook Maker</h1>
+  <button class="ghost" id="newBtn" style="display:none">New flipbook</button>
+</header>
+
+<div id="drop">
+  <h2>Turn a PDF into a flipbook</h2>
+  <p>Drag &amp; drop a PDF or a set of images here</p>
+  <label class="btn">Choose files<input id="file" type="file" accept="application/pdf,image/*" multiple hidden></label>
+</div>
+
+<div id="stage"><div id="book"></div></div>
+<div id="bar">
+  <button class="ghost" id="first">⏮</button>
+  <button id="prev">◀ Prev</button>
+  <span id="count"></span>
+  <button id="next">Next ▶</button>
+  <button class="ghost" id="last">⏭</button>
+  <button class="ghost" id="fs">⛶ Fullscreen</button>
+</div>
+<div id="status">Preparing pages…</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.js"></script>
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+const $ = id => document.getElementById(id);
+let flip = null;
+
+async function pdfToImages(file) {
+  const pdf = await pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise;
+  const out = [];
+  for (let i = 1; i <= pdf.numPages; i++) {
+    $('status').textContent = `Rendering page ${i} of ${pdf.numPages}…`;
+    const page = await pdf.getPage(i);
+    const vp = page.getViewport({ scale: 1.6 });
+    const c = document.createElement('canvas');
+    c.width = vp.width; c.height = vp.height;
+    await page.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
+    out.push(c.toDataURL('image/jpeg', 0.85));
+  }
+  return out;
+}
+const fileToURL = f => new Promise(r => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.readAsDataURL(f); });
+
+async function handle(files) {
+  files = [...files];
+  if (!files.length) return;
+  $('status').style.display = 'flex';
+  try {
+    let imgs = [];
+    const pdf = files.find(f => f.type === 'application/pdf');
+    if (pdf) imgs = await pdfToImages(pdf);
+    else imgs = await Promise.all(files.filter(f => f.type.startsWith('image/')).sort((a,b)=>a.name.localeCompare(b.name,undefined,{numeric:true})).map(fileToURL));
+    if (!imgs.length) throw new Error('No PDF or images found');
+    build(imgs);
+  } catch (e) { alert('Could not build flipbook: ' + e.message); }
+  $('status').style.display = 'none';
+}
+
+function build(imgs) {
+  if (flip) { flip.destroy(); flip = null; }
+  const book = $('book');
+  book.innerHTML = '';
+  imgs.forEach(src => { const d = document.createElement('div'); d.className = 'page'; d.innerHTML = `<img src="${src}" alt="">`; book.appendChild(d); });
+  $('drop').style.display = 'none';
+  $('stage').style.display = 'flex'; $('bar').style.display = 'flex'; $('newBtn').style.display = '';
+  const probe = new Image();
+  probe.onload = () => {
+    const ratio = probe.width / probe.height;
+    const h = Math.min(innerHeight - 170, 900);
+    flip = new St.PageFlip(book, {
+      width: Math.round(h * ratio), height: h, size: 'stretch',
+      minWidth: 200, maxWidth: 1000, minHeight: 280, maxHeight: 1400,
+      showCover: true, maxShadowOpacity: .5, mobileScrollSupport: false
+    });
+    flip.loadFromHTML(book.querySelectorAll('.page'));
+    flip.on('flip', upd); upd();
+  };
+  probe.src = imgs[0];
+}
+function upd() { if (flip) $('count').textContent = `${flip.getCurrentPageIndex() + 1} / ${flip.getPageCount()}`; }
+
+$('file').onchange = e => handle(e.target.files);
+const drop = $('drop');
+['dragenter','dragover'].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.add('over'); }));
+['dragleave','drop'].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.remove('over'); }));
+drop.addEventListener('drop', e => handle(e.dataTransfer.files));
+$('prev').onclick = () => flip && flip.flipPrev();
+$('next').onclick = () => flip && flip.flipNext();
+$('first').onclick = () => flip && flip.flip(0);
+$('last').onclick = () => flip && flip.flip(flip.getPageCount() - 1);
+$('fs').onclick = () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+$('newBtn').onclick = () => { location.reload(); };
+addEventListener('keydown', e => { if (!flip) return; if (e.key === 'ArrowRight') flip.flipNext(); if (e.key === 'ArrowLeft') flip.flipPrev(); });
+</script>
+</body>
+</html>
